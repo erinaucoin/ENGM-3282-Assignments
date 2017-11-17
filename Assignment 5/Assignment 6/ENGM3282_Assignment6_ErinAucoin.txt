@@ -1,0 +1,883 @@
+/*********************** Question 1 source file ********************/
+
+/* File: stacksentinel.cpp
+   This program implements a simple stack of integers using a linked list
+   with a sentinel.
+ 
+   Programmer:  Erin Aucoin
+   Student ID:  B00631829
+   Date:        October 20, 2017
+*/
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+class node {
+	
+friend class stack; 		// stack needs access to node’s members
+
+private:
+	int data; 				// this is the data in a stack node
+	node *next; 			// pointer to the next stack node
+
+public:
+	node(int x); 			// data = x, next = NULL
+};
+
+class stack {
+private:
+	node sentinel; 						// sentinel for the stack
+	
+public:
+	stack(void); 						// constructor
+	void push(int x);
+	int pop(void);
+	bool empty(void) const; 			// check for empty stack
+	void write(ostream &out) const; 	// write the stack to out
+};
+
+int main()
+{
+	stack mystack;
+	ofstream fout ("stacksentinelout.txt");
+	char ch;
+	int x;
+	
+	cout << "A dynamic stack of integers\n";
+	fout << "A dynamic stack of integers\n";
+	do {
+		// print a little menu
+		cout << "\n\np = push \n";
+		cout << "o = pop\n";
+		cout << "s = print to screen\n";
+		cout << "f = print to file\n";
+		cout << "q = quit\n\n";
+		
+		cin >> ch;
+
+		if (ch =='p') {
+			cout <<"\ndata to push :";
+			cin >> x;
+			mystack.push(x);
+		}
+		else if(ch == 'o') {
+			if(mystack.empty()) {
+				cout << "Stack is empty\n";
+			} else {
+				cout << "\n\ndata popped : " << mystack.pop();
+			}
+		}
+		else if(ch == 's') mystack.write(cout);
+		else if(ch == 'f') mystack.write(fout);
+	
+	}while(ch != 'q');
+
+	fout.close();
+	return 0;
+}
+
+node::node(int x)
+{
+	data = x;
+	next = NULL;
+}
+
+stack::stack() : sentinel(0)
+{
+	
+}
+
+void stack::push(int x)
+{
+	node* ptr;
+	
+	ptr = new node(x);				// make ptr point to a new node storing x
+	
+	ptr->next = sentinel.next;		// connect *ptr into the list
+	sentinel.next = ptr;			// make ptr the new first of list
+}
+
+int stack::pop()
+{
+	
+	int temp = 0;					// return 0 if stack is empty
+	
+	if(sentinel.next != NULL){
+		temp = sentinel.next->data;		// hold onto this value until the end
+		node* ptr = sentinel.next;		// remember the top of the stack
+		
+		sentinel.next = sentinel.next-> next;		// move the top to the next node in the list
+		delete ptr;						// release the memory used by the old top
+	}
+	return temp;
+}
+
+bool stack::empty() const
+{
+	return(sentinel.next == NULL);
+}
+
+void stack::write(ostream& out) const
+{
+	node* ptr = sentinel.next;			// ptr will move down the list
+	
+	while(ptr != NULL) {
+		out << ptr -> data << ", ";		// print the data
+		ptr = ptr -> next;				// move one position down the line
+	}
+	
+	out << endl;
+}
+
+/*********************** Question 1 output file ********************/
+
+/////////////////// Screen Output \\\\\\\\\\\\\\\\\\\
+
+A dynamic stack of integers
+
+
+p = push
+o = pop
+s = print to screen
+f = print to file
+q = quit
+
+p
+
+data to push :1
+
+
+p = push
+o = pop
+s = print to screen
+f = print to file
+q = quit
+
+p
+
+data to push :2
+
+
+p = push
+o = pop
+s = print to screen
+f = print to file
+q = quit
+
+p
+
+data to push :3
+
+
+p = push
+o = pop
+s = print to screen
+f = print to file
+q = quit
+
+p
+
+data to push :4
+
+
+p = push
+o = pop
+s = print to screen
+f = print to file
+q = quit
+
+f
+
+
+p = push
+o = pop
+s = print to screen
+f = print to file
+q = quit
+
+o
+
+
+data popped : 4
+
+p = push
+o = pop
+s = print to screen
+f = print to file
+q = quit
+
+o
+
+
+data popped : 3
+
+p = push
+o = pop
+s = print to screen
+f = print to file
+q = quit
+
+f
+
+
+p = push
+o = pop
+s = print to screen
+f = print to file
+q = quit
+
+q
+
+--------------------------------
+Process exited after 46.11 seconds with return value 0
+Press any key to continue . . .
+
+/////////////////// File Output \\\\\\\\\\\\\\\\\\\
+
+A dynamic stack of integers
+4, 3, 2, 1, 
+2, 1, 
+
+
+/*********************** Question 2 source file ********************/
+
+/* File: stacq.cpp
+   This program implements a cross between a stack and a queue
+ 
+   Programmer:  Erin Aucoin
+   Student ID:  B00631829
+   Date:        October 20, 2017
+*/
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+class node {
+friend class stacq;
+
+private:
+	int data; 					// this is the data in a stacq element
+	node *next; 				// pointer to the next node on the stack
+	
+public:
+	node(int x) {data = x; next = NULL;}
+};
+
+class stacq {
+private:
+	int count; 					// number of values stored
+	node* top; 					// pointer to the top of the stacq
+	
+public:
+	stacq(void); 							// constructor of an empty stacq
+	void store(int x); 						// store the value x
+	int retrieve(void); 					// retrieve a value
+	bool empty(void) const; 				// check for empty stack
+	void write(ostream &out) const; 		// write stacq to out
+};
+
+int main()
+{
+	stacq mine;
+	ofstream fout ("stacqout.txt");
+	char ch;
+	int x;
+
+	cout << "A dynamic stacq of integers\n";
+	fout << "A dynamic stacq of integers\n";
+
+	do {
+		// print a little menu
+		cout << "\n\ns = store \n";
+		cout << "r = retrieve\n";
+		cout << "p = print to screen\n";
+		cout << "f = print to file\n";
+		cout << "q = quit\n\n";
+
+		cin >> ch;
+
+	if (ch == 's') {
+		cout <<"\ndata to store :";
+		cin >> x;
+		mine.store(x);
+	}
+	else if(ch == 'r') {
+		if(mine.empty())
+			cout << "empty\n";
+		else
+			cout << "\n\ndata retrieved :" << mine.retrieve();
+	}
+	else if(ch == 'p') mine.write(cout);
+	else if(ch == 'f') mine.write(fout);
+
+	}while(ch != 'q');
+
+	fout.close();
+	return 0;
+}
+
+stacq::stacq() : top(0)
+{
+	count = 0;
+}
+
+void stacq::store(int x)
+{
+	node* ptr;
+	
+	ptr = new node(x);				// make ptr point to a new node storing x
+	
+	ptr->next = top;				// connect *ptr into the list
+	top = ptr;						// make ptr the new first of list
+	
+	count++;
+}
+
+int stacq::retrieve()
+{
+	int temp = 0;						// return 0 if stack is empty
+	node* ptr = top;					// remember the top of the stack
+	
+	if(top != NULL){
+		if(count %2 != 0) {				// retrieve like a stack				
+			temp = top->data;			// hold onto this value until the end
+			
+			top = top-> next;			// move the top to the next node in the list
+		}
+		else {							// retreive like a queue
+			node* q = top;				// needed to mark the second to last node.
+			
+			while(ptr->next != NULL) {	// move down the queue until the last node
+				q = ptr;
+				ptr = ptr->next;
+			}
+			
+			q->next = NULL;				// cut off the last node from the queue
+			temp = ptr->data;			// remember the data of the last node
+			
+			if(ptr == top) {			// we are getting the last node in the queue
+				top = NULL;
+			}
+		}
+		count--;		
+	}
+	
+	delete ptr;							// release the memory used by the old top
+	
+	return temp;
+}
+
+bool stacq::empty() const
+{
+	return (top == NULL);
+}
+
+void stacq::write(ostream& out) const
+{
+	node* ptr = top;					// ptr will move down the list
+	
+	while(ptr != NULL) {
+		out << ptr -> data << ", ";		// print the data
+		ptr = ptr -> next;				// move one position down the line
+	}
+	
+	out << endl;
+}
+
+/*********************** Question 2 output file ********************/
+
+
+/////////////////// Screen Output \\\\\\\\\\\\\\\\\\\
+
+A dynamic stacq of integers
+
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+s
+
+data to store :1
+
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+s
+
+data to store :2
+
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+s
+
+data to store :3
+
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+s
+
+data to store :4
+
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+f
+
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+r
+
+
+data retrieved :1
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+f
+
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+r
+
+
+data retrieved :4
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+f
+
+
+s = store
+r = retrieve
+p = print to screen
+f = print to file
+q = quit
+
+q
+
+--------------------------------
+Process exited after 45.85 seconds with return value 0
+Press any key to continue . . .
+
+/////////////////// File Output \\\\\\\\\\\\\\\\\\\
+
+A dynamic stacq of integers
+4, 3, 2, 1, 
+4, 3, 2, 
+3, 2, 
+
+/*********************** Question 3 source file ********************/
+
+/* File: deque.cpp
+   This program implements a double ended queue of integers as a
+   doubly linked list.
+ 
+   Programmer:  Erin Aucoin
+   Student ID:  B00631829
+   Date:        October 20, 2017
+*/
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+class node {
+friend class deque;
+
+private:
+	int data; 			// this is the data in a list element
+	node *next; 		// pointer to the next node in the list
+	node *prev; 		// pointer to the previous node in the list
+
+public:
+	node(int x); 		// data = x, prev=next = NULL
+};
+
+class deque {
+private:
+	node* front; 		// pointer to the front of the list
+	node* back; 		// pointer to the back of the list
+
+public:
+	deque(void); 						// constructor of an empty queue
+	void put_front(int x); 				// put x at the front of the list
+	void put_back(int x); 				// put x at the back of the list
+	int get_front(void); 				// get the node at the front of the list
+	int get_back(void); 				// get the node at the back of the list
+	bool empty(void) const; 			// check for empty deque
+	void write(ostream &out) const; 	// write data stored to out
+};
+
+int main()
+{
+	deque mydeque;
+	ofstream fout ("dequeout.txt");
+	char ch;
+	int x;
+	
+	cout << "A dynamic deque of integers\n";
+	fout << "A dynamic deque of integers\n";
+	
+	do {
+		// print a little menu
+		cout << "\n\n1 = put front \n";
+		cout << "2 = put back \n";
+		cout << "3 = get front\n";
+		cout << "4 = get back\n";
+		cout << "s = print to screen\n";
+		cout << "f = print to file\n";
+		cout << "q = quit\n\n";
+		
+		cin >> ch;
+		
+		if (ch == '1') {
+			cout <<"\ndata to put front:";
+			cin >> x;
+			mydeque.put_front(x);
+		}
+		else if (ch == '2') {
+			cout <<"\ndata to put back:";
+			cin >> x;
+			mydeque.put_back(x);
+		}
+		else if(ch == '3') {
+			if(mydeque.empty()) {
+				cout << "deque is empty\n";
+			} else {
+				cout << "\n\ndata gotten : " << mydeque.get_front();
+			}
+		}
+		else if(ch == '4') {
+			if(mydeque.empty()) {
+				cout << "deque is empty\n";
+			} else {
+				cout << "\n\ndata gotten : " << mydeque.get_back();
+			}
+		}
+		else if(ch == 's') mydeque.write(cout);
+		else if(ch == 'f') mydeque.write(fout);
+		
+	}while(ch != 'q');
+	
+	fout.close();
+	return 0;
+}
+
+node::node(int x)
+{
+data = x;
+next = NULL;
+prev = NULL;
+}
+
+deque::deque()
+{
+}
+
+void deque::put_front(int x)
+{
+	node* ptr = new node(x);	// create a new node with data x -- next component of this node is set to NULL in node constructor
+	
+	if(front == NULL) {			// so is back -- deque is empty (special case)
+		back = front = ptr;		// make ptr both front and back
+	}
+	else {						//general case
+		ptr -> prev = front;
+		front -> next = ptr;
+		front = ptr;
+	}
+}
+
+void deque::put_back(int x)
+{
+	node* ptr = new node(x);	// create a new node with data x -- next component of this node is set to NULL in node constructor
+	
+	if(front == NULL) {			// so is back -- deque is empty (special case)
+		back = front = ptr;		// make ptr both front and back
+	}
+	else{
+		ptr -> next = back;
+		back -> prev = ptr;
+		back = ptr;		
+	}
+}
+
+int deque::get_front(){
+	if(front == NULL)
+		return 0;
+	
+	int temp;
+	node * ptr;
+
+	if(front == back) {   		// only one element in the deque (special case)
+		temp = front -> data;
+		delete front;			//delete the only node
+		front = back = NULL;	//update front and back -- deque is now empty
+	}
+	else{						//general case
+		ptr = front -> prev;
+		ptr -> next = NULL; 
+		temp = front -> data;
+		delete front;
+		front = ptr;
+	}
+	return temp;
+}
+
+int deque::get_back(){
+	if(front == NULL)
+		return 0;
+	
+	int temp;
+	node* ptr;
+	
+	if(front == back){			// only one element in the deque (special case)
+		temp = back -> data;
+		delete back;			//delete the only node
+		front = back = NULL;	//update front and back -- deque is now empty
+	}
+	else{						//general case
+		ptr = back -> next;
+		ptr -> prev = NULL;
+		temp = back -> data;
+		delete back;
+		back = ptr;
+	}
+	return temp;
+}
+
+bool deque::empty() const
+{
+	return (front == NULL);
+}
+
+void deque::write(ostream& out) const
+{
+	node* ptr = back;					// ptr will move down the list
+	
+	while(ptr != NULL) {
+		out << ptr -> data << ", ";		// print the data
+		ptr = ptr -> next;				// move one position down the line
+	}
+	
+	out << endl;
+}
+
+/*********************** Question 3 output file ********************/
+
+/////////////////// Screen Output \\\\\\\\\\\\\\\\\\\
+
+A dynamic deque of integers
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+1
+
+data to put front:1
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+1
+
+data to put front:2
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+1
+
+data to put front:3
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+f
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+2
+
+data to put back:4
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+2
+
+data to put back:5
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+2
+
+data to put back:6
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+f
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+3
+
+
+data gotten : 3
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+f
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+4
+
+
+data gotten : 6
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+f
+
+
+1 = put front
+2 = put back
+3 = get front
+4 = get back
+s = print to screen
+f = print to file
+q = quit
+
+q
+
+--------------------------------
+Process exited after 110.1 seconds with return value 0
+Press any key to continue . . .
+
+/////////////////// File Output \\\\\\\\\\\\\\\\\\\
+
+A dynamic deque of integers
+1, 2, 3, 
+6, 5, 4, 1, 2, 3, 
+6, 5, 4, 1, 2, 
+5, 4, 1, 2, 
+
+
