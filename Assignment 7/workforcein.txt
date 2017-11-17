@@ -1,0 +1,8 @@
+Smith 123 40000
+Jones 124 49000
+Black 125 42000
+White 101 50000
+Green 110 48000
+Zhang 115 52000
+Gould 111 47000
+Kelly 130 51000
